@@ -32,7 +32,7 @@ public class Program
         AnsiConsole.Markup($"Welcome {Environment.UserName} to NShell !\n\n");
         AnsiConsole.Markup($"\tversion : {VERSION}\n");
         AnsiConsole.Markup($"\tgithub  : {GITHUB}\n");
-        AnsiConsole.Markup("\t\n");
+        AnsiConsole.Markup("\n");
 
         AnsiConsole.Markup("[bold cyan][[*]] - Booting NShell...[/]\n");
         ShellContext context = new();

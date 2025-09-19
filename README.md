@@ -74,8 +74,8 @@ This is the result :
 ### 📡 Roadmap v1.0.0
 
 - [OPEN] Plugin support (dynamic loading)
-- [OPEN] Fix neofetch shell version
-- [OPEN] Fix interactive commands/scripts running configuration
+- [OK] Fix neofetch shell version
+- [OK] Fix interactive commands/scripts running configuration
 - [PROGRESS] Autocomplete
 - [PROGRESS] Command history
 - [OK] Profiles and theme switching
