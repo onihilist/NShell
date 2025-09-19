@@ -18,7 +18,7 @@ if [ -f "$BIN_PATH" ]; then
     echo "[*] - Removing $BIN_PATH & related folders/files..."
     sudo rm -rf "$BIN_PATH" "$N_SHELL_DIR"
 else
-    echo "[-] - No executable found at $BIN_PATH"
+    echo "[-] - No executable found at $BIN_PATH"discord
 fi
 
 if grep -Fxq "$BIN_PATH" /etc/shells; then

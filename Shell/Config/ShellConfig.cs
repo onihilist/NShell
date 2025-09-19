@@ -7,7 +7,7 @@ public class ShellConfig
 {
     public int HistoryExpirationTime { get; set; }
     public int HistoryMaxStorage { get; set; }
-    public string SelectedTheme { get; set; }
+    public required string SelectedTheme { get; set; }
 
     public static ShellConfig? LoadConfig()
     {
