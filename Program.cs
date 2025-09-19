@@ -8,7 +8,7 @@ using static NShell.Animation.GlitchOutput;
 
 public class Program
 {
-    public static readonly string VERSION = "v0.2.1";
+    public static readonly string VERSION = "0.2.2-pre";
     public static readonly string GITHUB = "https://github.com/onihilist/NShell";
 
     public static async Task Main(string[] args)
