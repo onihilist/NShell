@@ -51,7 +51,5 @@ namespace NShell.Shell.Plugins
                 Directory.CreateDirectory(PluginFolderPath);
             }
         }
-        
     }
-    
 }

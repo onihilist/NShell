@@ -16,7 +16,6 @@ public static class CommandLoader
     public static void RefreshCommands()
     {
         var paths = Environment.GetEnvironmentVariable("PATH")?.Split(':') ?? Array.Empty<string>();
-
         var newCommands = new HashSet<string>();
 
         foreach (var path in paths)
@@ -46,9 +45,7 @@ public static class CommandLoader
                 AnsiConsole.MarkupLine($"[[[red]-[/]]] - Error accessing directory {path}: [bold yellow]{ex.Message}[/]");
             }
         }
-
         HashSet<string> availableCommands = newCommands;
         AnsiConsole.MarkupLine($"[[[green]+[/]]] - Refreshed command list. Found {availableCommands.Count} new commands.");
     }
-    
 }
