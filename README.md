@@ -73,7 +73,7 @@ This is the result :
 
 ### 📡 Roadmap v1.0.0
 
-- [OPEN] Plugin support (dynamic loading)
+- [PROGRESS] Plugin support (dynamic loading)
 - [OK] Fix neofetch shell version
 - [OK] Fix interactive commands/scripts running configuration
 - [PROGRESS] Autocomplete
@@ -100,3 +100,4 @@ sudo apt update
 sudo apt install dos2unix
 dos2unix install.sh
 ```
+
