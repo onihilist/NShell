@@ -13,8 +13,6 @@
 **NShell** is a lightweight, extensible shell written in C# using [.NET 8.0+].  
 It's designed for hackers, shell lovers, and those who enjoy boot sequences.
 
-⚠️ This is an **alpha build** — many features are experimental, and some commands might fail gloriously.
-
 ---
 
 ### ✨ Features
@@ -100,4 +98,5 @@ sudo apt update
 sudo apt install dos2unix
 dos2unix install.sh
 ```
+
 
