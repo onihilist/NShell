@@ -30,6 +30,10 @@ public static class CommandRegistry
             new PrintEnvCommand(),
             new AliasCommand(),
             new UnaliasCommand(),
+            new HistoryCommand(),
+            new EchoCommand(),
+            new PwdCommand(),
+            new WhichCommand(),
         };
     }
     

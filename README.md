@@ -24,6 +24,13 @@ It's designed for hackers, shell lovers, and those who enjoy boot sequences.
 - ✅ Spectre.Console markup support for colors, glitches, animations
 - ✅ Full AOT support (with manual command registration)
 - ✅ Future-proof extensibility (plugin-style architecture)
+- ✅ Tab completion for commands and file paths
+- ✅ Command history with Ctrl+R reverse search
+- ✅ Command aliases (alias/unalias)
+- ✅ Environment variable management (export/unset/printenv)
+- ✅ Word-based cursor navigation (Ctrl+Left/Right)
+- ✅ Rich built-in commands (help, history, which, pwd, echo, clear, exit)
+
 
 ---
 
@@ -74,11 +81,42 @@ This is the result :
 - [PROGRESS] Plugin support (dynamic loading)
 - [OK] Fix neofetch shell version
 - [OK] Fix interactive commands/scripts running configuration
-- [PROGRESS] Autocomplete
-- [PROGRESS] Command history
+- [OK] Autocomplete
+- [OK] Command history
 - [OK] Profiles and theme switching
 - [OK] Remove Bash FallBack
 - [OK] Themes & ThemeLoader
+
+---
+
+### 🔨 Built-in Commands
+
+NShell comes with a rich set of built-in commands:
+
+| Command | Description |
+|---------|-------------|
+| `help` | Display all available commands with descriptions |
+| `exit` | Exit the shell gracefully |
+| `clear` | Clear the terminal screen |
+| `cd <dir>` | Change directory |
+| `pwd` | Print current working directory |
+| `echo <text>` | Display text (supports variable expansion) |
+| `history [n]` | Show command history (optionally last n commands) |
+| `alias name='cmd'` | Create command alias |
+| `unalias name` | Remove command alias |
+| `export VAR=value` | Set environment variable |
+| `unset VAR` | Remove environment variable |
+| `printenv [VAR]` | Print environment variables |
+| `which <cmd>` | Show path to command |
+| `settheme <name>` | Change shell theme |
+
+**Keyboard Shortcuts:**
+- `Tab` - Auto-complete commands and paths
+- `Ctrl+R` - Reverse history search
+- `Ctrl+A` / `Home` - Move cursor to start of line
+- `Ctrl+E` / `End` - Move cursor to end of line
+- `Ctrl+Left/Right` - Move cursor by word
+- `Up/Down` - Navigate command history
 
 ---
 
