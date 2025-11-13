@@ -68,7 +68,7 @@ public class CommandParser
 
     /// <summary>
     /// Attempts to execute a command from the provided command line input.
-    /// Handles variable expansion, root privileges, and command execution.
+    /// Handles variable expansion, root privileges, piping, redirection, chaining, and command execution.
     /// </summary>
     /// <param name="commandLine">The command line string entered by the user.</param>
     /// <param name="context">The shell context that contains environment variables and the current directory.</param>
@@ -77,17 +77,213 @@ public class CommandParser
     {
         var expanded = context.ExpandVariables(commandLine);
         
+        // Handle command chaining (&&, ||, ;)
+        if (expanded.Contains("&&") || expanded.Contains("||") || expanded.Contains(';'))
+        {
+            return ExecuteChainedCommands(expanded, context);
+        }
+        
+        // Handle piping (|)
+        if (expanded.Contains('|'))
+        {
+            return ExecutePipeline(expanded, context);
+        }
+        
+        // Handle output redirection (>, >>)
+        string? redirectFile = null;
+        bool appendMode = false;
+        
+        if (expanded.Contains(">>"))
+        {
+            var redirectParts = expanded.Split(">>", 2);
+            expanded = redirectParts[0].Trim();
+            redirectFile = redirectParts[1].Trim();
+            appendMode = true;
+        }
+        else if (expanded.Contains('>'))
+        {
+            var redirectParts = expanded.Split('>', 2);
+            expanded = redirectParts[0].Trim();
+            redirectFile = redirectParts[1].Trim();
+            appendMode = false;
+        }
+        
+        // Redirect output if needed
+        TextWriter? originalOut = null;
+        StreamWriter? fileWriter = null;
+        
+        if (redirectFile != null)
+        {
+            try
+            {
+                originalOut = Console.Out;
+                fileWriter = new StreamWriter(redirectFile, appendMode);
+                Console.SetOut(fileWriter);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[[[red]-[/]]] - Error opening file for redirection: {ex.Message}");
+                return true;
+            }
+        }
+        
+        try
+        {
+            return ExecuteSingleCommand(expanded, context);
+        }
+        finally
+        {
+            // Restore original output
+            if (originalOut != null)
+            {
+                Console.SetOut(originalOut);
+                fileWriter?.Close();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Executes chained commands with &&, ||, or ;
+    /// </summary>
+    private bool ExecuteChainedCommands(string commandLine, ShellContext context)
+    {
+        // Split by ; first (unconditional execution)
+        var semicolonParts = SplitByOperator(commandLine, ';');
+        
+        foreach (var part in semicolonParts)
+        {
+            var trimmedPart = part.Trim();
+            if (string.IsNullOrWhiteSpace(trimmedPart)) continue;
+            
+            // Check for && (execute if previous succeeded)
+            if (trimmedPart.Contains("&&"))
+            {
+                var andParts = SplitByOperator(trimmedPart, "&&");
+                bool previousSuccess = true;
+                
+                foreach (var andPart in andParts)
+                {
+                    if (!previousSuccess) break;
+                    
+                    var cmd = andPart.Trim();
+                    if (!string.IsNullOrWhiteSpace(cmd))
+                    {
+                        previousSuccess = TryExecute(cmd, context);
+                    }
+                }
+            }
+            // Check for || (execute if previous failed)
+            else if (trimmedPart.Contains("||"))
+            {
+                var orParts = SplitByOperator(trimmedPart, "||");
+                bool previousSuccess = false;
+                
+                foreach (var orPart in orParts)
+                {
+                    if (previousSuccess) break;
+                    
+                    var cmd = orPart.Trim();
+                    if (!string.IsNullOrWhiteSpace(cmd))
+                    {
+                        previousSuccess = TryExecute(cmd, context);
+                    }
+                }
+            }
+            else
+            {
+                TryExecute(trimmedPart, context);
+            }
+        }
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Splits a string by an operator, respecting quotes.
+    /// </summary>
+    private List<string> SplitByOperator(string input, string op)
+    {
+        var parts = new List<string>();
+        var current = new System.Text.StringBuilder();
+        bool inQuotes = false;
+        
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = input[i];
+            
+            if (c == '"' || c == '\'')
+            {
+                inQuotes = !inQuotes;
+                current.Append(c);
+            }
+            else if (!inQuotes && i + op.Length <= input.Length && input.Substring(i, op.Length) == op)
+            {
+                parts.Add(current.ToString());
+                current.Clear();
+                i += op.Length - 1;
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+        
+        if (current.Length > 0)
+        {
+            parts.Add(current.ToString());
+        }
+        
+        return parts;
+    }
+
+    /// <summary>
+    /// Splits a string by a single character operator.
+    /// </summary>
+    private List<string> SplitByOperator(string input, char op)
+    {
+        return SplitByOperator(input, op.ToString());
+    }
+
+    /// <summary>
+    /// Executes a pipeline of commands separated by pipes.
+    /// </summary>
+    private bool ExecutePipeline(string pipeline, ShellContext context)
+    {
+        var commands = pipeline.Split('|').Select(c => c.Trim()).ToArray();
+        
+        if (commands.Length < 2)
+        {
+            return ExecuteSingleCommand(pipeline, context);
+        }
+
+        AnsiConsole.MarkupLine("[[[yellow]*[/]]] - Piping is partially supported. Complex pipelines may not work as expected.");
+        
+        // For now, just execute each command independently
+        // Full pipe implementation would require capturing stdout and passing to stdin
+        foreach (var cmd in commands)
+        {
+            ExecuteSingleCommand(cmd, context);
+        }
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Executes a single command without piping or redirection.
+    /// </summary>
+    private bool ExecuteSingleCommand(string commandLine, ShellContext context)
+    {
         // Check for alias expansion
-        var parts = expanded.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var parts = commandLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length > 0 && NShell.Commands.AliasCommand.Aliases.TryGetValue(parts[0], out var aliasValue))
         {
             // Replace alias with its value and append remaining arguments
-            expanded = aliasValue;
+            commandLine = aliasValue;
             if (parts.Length > 1)
             {
-                expanded += " " + string.Join(' ', parts.Skip(1));
+                commandLine += " " + string.Join(' ', parts.Skip(1));
             }
-            parts = expanded.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            parts = commandLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         }
         
         if (parts.Length == 0) return false;

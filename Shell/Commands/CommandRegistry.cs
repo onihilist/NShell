@@ -34,6 +34,7 @@ public static class CommandRegistry
             new EchoCommand(),
             new PwdCommand(),
             new WhichCommand(),
+            new AboutCommand(),
         };
     }
     

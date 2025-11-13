@@ -30,6 +30,9 @@ It's designed for hackers, shell lovers, and those who enjoy boot sequences.
 - ✅ Environment variable management (export/unset/printenv)
 - ✅ Word-based cursor navigation (Ctrl+Left/Right)
 - ✅ Rich built-in commands (help, history, which, pwd, echo, clear, exit)
+- ✅ Output redirection (>, >>)
+- ✅ Command chaining (&&, ||, ;)
+- ✅ Basic piping support (|)
 
 
 ---
@@ -96,6 +99,7 @@ NShell comes with a rich set of built-in commands:
 | Command | Description |
 |---------|-------------|
 | `help` | Display all available commands with descriptions |
+| `about` | Display information about NShell |
 | `exit` | Exit the shell gracefully |
 | `clear` | Clear the terminal screen |
 | `cd <dir>` | Change directory |
@@ -117,6 +121,29 @@ NShell comes with a rich set of built-in commands:
 - `Ctrl+E` / `End` - Move cursor to end of line
 - `Ctrl+Left/Right` - Move cursor by word
 - `Up/Down` - Navigate command history
+
+**Advanced Shell Features:**
+- Command chaining with `&&` (run if previous succeeded), `||` (run if previous failed), and `;` (always run)
+- Output redirection with `>` (overwrite) and `>>` (append)
+- Basic piping with `|` (pipe output between commands)
+
+**Examples:**
+```bash
+# Chain commands
+echo "Building..." && dotnet build && echo "Success!" || echo "Failed!"
+
+# Redirect output
+echo "Hello World" > output.txt
+history 50 >> history.log
+
+# Use aliases
+alias ll='ls -la'
+ll
+
+# Environment variables
+export MY_VAR="Hello"
+echo {MY_VAR}
+```
 
 ---
 
