@@ -106,7 +106,7 @@ NShell comes with a rich set of built-in commands:
 | `pwd` | Print current working directory |
 | `echo <text>` | Display text (supports variable expansion) |
 | `history [n]` | Show command history (optionally last n commands) |
-| `alias name='cmd'` | Create command alias |
+| `alias name='cmd'` | Create command alias (persisted across sessions) |
 | `unalias name` | Remove command alias |
 | `export VAR=value` | Set environment variable |
 | `unset VAR` | Remove environment variable |
@@ -126,6 +126,8 @@ NShell comes with a rich set of built-in commands:
 - Command chaining with `&&` (run if previous succeeded), `||` (run if previous failed), and `;` (always run)
 - Output redirection with `>` (overwrite) and `>>` (append)
 - Basic piping with `|` (pipe output between commands)
+- Smart command suggestions with "Did you mean...?" for typos
+- Persistent aliases (saved in `~/.nshell/nshellrc.json`)
 
 **Examples:**
 ```bash
@@ -136,13 +138,16 @@ echo "Building..." && dotnet build && echo "Success!" || echo "Failed!"
 echo "Hello World" > output.txt
 history 50 >> history.log
 
-# Use aliases
+# Use aliases (persisted across sessions)
 alias ll='ls -la'
 ll
 
 # Environment variables
 export MY_VAR="Hello"
 echo {MY_VAR}
+
+# Fast startup
+nshell --no-banner
 ```
 
 ---

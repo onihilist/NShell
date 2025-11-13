@@ -1,5 +1,6 @@
 using NShell.Shell;
 using NShell.Shell.Commands;
+using NShell.Shell.Config;
 using Spectre.Console;
 
 namespace NShell.Commands;
@@ -11,6 +12,17 @@ public class AliasCommand : ICustomCommand, IMetadataCommand
     
     // Static dictionary to store aliases
     public static Dictionary<string, string> Aliases { get; } = new Dictionary<string, string>();
+    private static readonly ConfigManager _configManager = new ConfigManager();
+    
+    static AliasCommand()
+    {
+        // Load saved aliases on first use
+        var savedAliases = _configManager.LoadAliases();
+        foreach (var alias in savedAliases)
+        {
+            Aliases[alias.Key] = alias.Value;
+        }
+    }
 
     public void Execute(ShellContext context, string[] args)
     {
@@ -52,6 +64,7 @@ public class AliasCommand : ICustomCommand, IMetadataCommand
         }
 
         Aliases[aliasName] = aliasValue;
+        _configManager.SaveAliases(Aliases);
         AnsiConsole.MarkupLine($"[[[green]+[/]]] - Alias created: [yellow]{aliasName}[/]=[green]'{aliasValue}'[/]");
     }
 }
