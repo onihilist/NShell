@@ -16,6 +16,8 @@ namespace NShell.Shell.History
         private readonly List<string> _history = new();
         private int _currentIndex = -1;
 
+        public int Count => _history.Count;
+
         public HistoryManager(string? path = null)
         {
             _historyPath = path ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nshell/.nhistory");
@@ -80,6 +82,18 @@ namespace NShell.Shell.History
         public void ResetIndex()
         {
             _currentIndex = _history.Count;
+        }
+
+        /// <summary>
+        /// Get a history item at a specific index.
+        /// </summary>
+        /// <param name="index">The index of the history item.</param>
+        /// <returns>The command at the specified index, or null if out of range.</returns>
+        public string? GetAt(int index)
+        {
+            if (index >= 0 && index < _history.Count)
+                return _history[index];
+            return null;
         }
     }
 }

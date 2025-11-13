@@ -22,6 +22,14 @@ public static class CommandRegistry
         {
             new CdCommand(),
             new SetThemeCommand(),
+            new ExitCommand(),
+            new ClearCommand(),
+            new HelpCommand(),
+            new ExportCommand(),
+            new UnsetCommand(),
+            new PrintEnvCommand(),
+            new AliasCommand(),
+            new UnaliasCommand(),
         };
     }
     

@@ -74,6 +74,7 @@ public partial class KeyHandler
 		_keyBindings["Tab"] = HandleTab;
 		_keyBindings["ControlLeftArrow"] = MoveCursorWordLeft;
 		_keyBindings["ControlRightArrow"] = MoveCursorWordRight;
+		_keyBindings["ControlR"] = HandleHistorySearch;
 	}
 
 	private string BuildKeyInput()

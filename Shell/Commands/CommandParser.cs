@@ -76,7 +76,20 @@ public class CommandParser
     public bool TryExecute(string commandLine, ShellContext context)
     {
         var expanded = context.ExpandVariables(commandLine);
+        
+        // Check for alias expansion
         var parts = expanded.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length > 0 && NShell.Commands.AliasCommand.Aliases.TryGetValue(parts[0], out var aliasValue))
+        {
+            // Replace alias with its value and append remaining arguments
+            expanded = aliasValue;
+            if (parts.Length > 1)
+            {
+                expanded += " " + string.Join(' ', parts.Skip(1));
+            }
+            parts = expanded.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        }
+        
         if (parts.Length == 0) return false;
 
         var usedSudo = parts[0] == "sudo";

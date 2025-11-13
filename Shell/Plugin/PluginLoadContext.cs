@@ -14,8 +14,7 @@ public class PluginLoadContext : AssemblyLoadContext
     {
         if (assemblyName.Name == "System.Runtime"
             || assemblyName.Name == "System.Private.CoreLib"
-            || assemblyName.Name.StartsWith("System.")
-            || assemblyName.Name.StartsWith("Microsoft."))
+            || (assemblyName.Name != null && (assemblyName.Name.StartsWith("System.") || assemblyName.Name.StartsWith("Microsoft."))))
         {
             return null;
         }
