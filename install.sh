@@ -52,7 +52,6 @@ dotnet publish NShell.csproj \
     -r linux-x64 \
     --self-contained true \
     /p:PublishSingleFile=true \
-    /p:PublishTrimmed=true \
     /p:IncludeNativeLibrariesForSelfExtract=true \
     -o ./publish
 

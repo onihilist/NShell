@@ -13,8 +13,8 @@ namespace NShell.Shell
     {
         public string CurrentDirectory { get; set; }
         public string CurrentTheme { get; set; } = "default";
-        public string Prompt { get; private set; }
-        public string LSColors { get; private set; }
+        public string Prompt { get; private set; } = string.Empty;
+        public string LSColors { get; private set; } = "di=34:fi=37:ln=36:pi=33:so=35:ex=32";
         public Dictionary<string, ICustomCommand> CustomCommands => CommandParser.CustomCommands;
 
         public ShellContext()

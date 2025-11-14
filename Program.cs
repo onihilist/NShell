@@ -8,11 +8,13 @@ using static NShell.Animation.GlitchOutput;
 
 public class Program
 {
-    public static readonly string VERSION = "0.3.0-pre";
+    public static readonly string VERSION = "0.5.1";
     public static readonly string GITHUB = "https://github.com/onihilist/NShell";
 
     public static async Task Main(string[] args)
     {
+        bool noBanner = false;
+        
         if (args.Length > 0)
         {
             switch (args[0])
@@ -23,30 +25,50 @@ public class Program
                     return;
                 case "--help":
                 case "-h":
-                    Console.WriteLine("Usage: nshell [--version | --help]");
+                    Console.WriteLine("Usage: nshell [--version | --help | --no-banner]");
+                    Console.WriteLine("\nOptions:");
+                    Console.WriteLine("  --version, -v     Show version information");
+                    Console.WriteLine("  --help, -h        Show this help message");
+                    Console.WriteLine("  --no-banner       Start without the welcome banner");
                     return;
+                case "--no-banner":
+                    noBanner = true;
+                    break;
             }
         }
 
         AnsiConsole.Clear();
-        AnsiConsole.Markup($"Welcome {Environment.UserName} to NShell !\n\n");
-        AnsiConsole.Markup($"\tversion : {VERSION}\n");
-        AnsiConsole.Markup($"\tgithub  : {GITHUB}\n");
-        AnsiConsole.Markup("\n");
+        
+        if (!noBanner)
+        {
+            AnsiConsole.Markup($"Welcome {Environment.UserName} to NShell !\n\n");
+            AnsiConsole.Markup($"\tversion : {VERSION}\n");
+            AnsiConsole.Markup($"\tgithub  : {GITHUB}\n");
+            AnsiConsole.Markup("\n");
+        }
 
         AnsiConsole.Markup("[bold cyan][[*]] - Booting NShell...[/]\n");
         ShellContext context = new();
-        PluginLoader plugins = new();
         AnsiConsole.Markup("[bold cyan][[*]] - Loading command(s)...[/]\n");
         CommandParser parser = new();
+        PluginLoader plugins = new();
         AnsiConsole.Markup("[bold cyan][[*]] - Loading plugin(s)...[/]\n");
         plugins.LoadPlugins();
-
+        parser.LoadCommands();
+        
         AppDomain.CurrentDomain.ProcessExit += (_, _) => {
             ReadLine.History.Save();
         };
 
-        await GlitchedPrint("[+] - System Online", TimeSpan.FromMilliseconds(20));
+        if (!noBanner)
+        {
+            await GlitchedPrint("[+] - System Online", TimeSpan.FromMilliseconds(20));
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("[bold green][[+]] - System Online[/]");
+        }
+        
         string inputBuffer;
 
         while (true)

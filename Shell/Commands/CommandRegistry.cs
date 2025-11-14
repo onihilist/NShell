@@ -20,8 +20,18 @@ public static class CommandRegistry
     {
         return new List<ICustomCommand>
         {
-            new CdCommand(),
             new SetThemeCommand(),
+            new ExitCommand(),
+            new ClearCommand(),
+            new HelpCommand(),
+            new ExportCommand(),
+            new UnsetCommand(),
+            new PrintEnvCommand(),
+            new AliasCommand(),
+            new UnaliasCommand(),
+            new HistoryCommand(),
+            new WhichCommand(),
+            new AboutCommand(),
         };
     }
     
