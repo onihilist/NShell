@@ -49,12 +49,13 @@ public class Program
 
         AnsiConsole.Markup("[bold cyan][[*]] - Booting NShell...[/]\n");
         ShellContext context = new();
-        PluginLoader plugins = new();
         AnsiConsole.Markup("[bold cyan][[*]] - Loading command(s)...[/]\n");
         CommandParser parser = new();
+        PluginLoader plugins = new();
         AnsiConsole.Markup("[bold cyan][[*]] - Loading plugin(s)...[/]\n");
         plugins.LoadPlugins();
-
+        parser.LoadCommands();
+        
         AppDomain.CurrentDomain.ProcessExit += (_, _) => {
             ReadLine.History.Save();
         };

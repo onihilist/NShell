@@ -9,7 +9,7 @@ namespace NShell.Shell.Commands;
 /// </summary>
 public class CommandParser
 {
-    public static readonly Dictionary<string, ICustomCommand> CustomCommands = new();
+    internal static readonly Dictionary<string, ICustomCommand> CustomCommands = new();
     public static readonly HashSet<string> SystemCommands = new();
     private static readonly HashSet<string> InteractiveCommands = new()
     {
@@ -19,19 +19,17 @@ public class CommandParser
     /// <summary>
     /// Constructor that loads the commands when the parser is instantiated.
     /// </summary>
-    public CommandParser()
-    {
-        LoadCommands();
-    }
+    public CommandParser(){}
 
     /// <summary>
     /// Loads all the custom commands and system commands from predefined directories.
     /// </summary>
-    private void LoadCommands()
+    internal void LoadCommands()
     {
+        // Load all commands from the CommandRegistry (including plugin commands)
         foreach (var command in CommandRegistry.GetAll())
         {
-            CustomCommands[command.Name] = command;
+            CustomCommands[command.Name.ToLower()] = command;
             AnsiConsole.MarkupLine($"\t[[[green]+[/]]] - Loaded custom command: [yellow]{command.Name}[/]");
         }
 
@@ -147,46 +145,31 @@ public class CommandParser
     /// </summary>
     private bool ExecuteChainedCommands(string commandLine, ShellContext context)
     {
-        // Split by ; first (unconditional execution)
         var semicolonParts = SplitByOperator(commandLine, ';');
-        
+
         foreach (var part in semicolonParts)
         {
             var trimmedPart = part.Trim();
             if (string.IsNullOrWhiteSpace(trimmedPart)) continue;
-            
-            // Check for && (execute if previous succeeded)
+
             if (trimmedPart.Contains("&&"))
             {
                 var andParts = SplitByOperator(trimmedPart, "&&");
                 bool previousSuccess = true;
-                
                 foreach (var andPart in andParts)
                 {
                     if (!previousSuccess) break;
-                    
-                    var cmd = andPart.Trim();
-                    if (!string.IsNullOrWhiteSpace(cmd))
-                    {
-                        previousSuccess = TryExecute(cmd, context);
-                    }
+                    previousSuccess = TryExecute(andPart.Trim(), context);
                 }
             }
-            // Check for || (execute if previous failed)
             else if (trimmedPart.Contains("||"))
             {
                 var orParts = SplitByOperator(trimmedPart, "||");
                 bool previousSuccess = false;
-                
                 foreach (var orPart in orParts)
                 {
                     if (previousSuccess) break;
-                    
-                    var cmd = orPart.Trim();
-                    if (!string.IsNullOrWhiteSpace(cmd))
-                    {
-                        previousSuccess = TryExecute(cmd, context);
-                    }
+                    previousSuccess = TryExecute(orPart.Trim(), context);
                 }
             }
             else
@@ -194,7 +177,7 @@ public class CommandParser
                 TryExecute(trimmedPart, context);
             }
         }
-        
+
         return true;
     }
 
@@ -206,11 +189,10 @@ public class CommandParser
         var parts = new List<string>();
         var current = new System.Text.StringBuilder();
         bool inQuotes = false;
-        
+
         for (int i = 0; i < input.Length; i++)
         {
             char c = input[i];
-            
             if (c == '"' || c == '\'')
             {
                 inQuotes = !inQuotes;
@@ -227,12 +209,10 @@ public class CommandParser
                 current.Append(c);
             }
         }
-        
+
         if (current.Length > 0)
-        {
             parts.Add(current.ToString());
-        }
-        
+
         return parts;
     }
 
@@ -250,21 +230,19 @@ public class CommandParser
     private bool ExecutePipeline(string pipeline, ShellContext context)
     {
         var commands = pipeline.Split('|').Select(c => c.Trim()).ToArray();
-        
+
         if (commands.Length < 2)
         {
             return ExecuteSingleCommand(pipeline, context);
         }
 
         AnsiConsole.MarkupLine("[[[yellow]*[/]]] - Piping is partially supported. Complex pipelines may not work as expected.");
-        
-        // For now, just execute each command independently
-        // Full pipe implementation would require capturing stdout and passing to stdin
+
         foreach (var cmd in commands)
         {
             ExecuteSingleCommand(cmd, context);
         }
-        
+
         return true;
     }
 
@@ -273,33 +251,18 @@ public class CommandParser
     /// </summary>
     private bool ExecuteSingleCommand(string commandLine, ShellContext context)
     {
-        // Check for alias expansion
         var parts = commandLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length > 0 && NShell.Commands.AliasCommand.Aliases.TryGetValue(parts[0], out var aliasValue))
-        {
-            // Replace alias with its value and append remaining arguments
-            commandLine = aliasValue;
-            if (parts.Length > 1)
-            {
-                commandLine += " " + string.Join(' ', parts.Skip(1));
-            }
-            parts = commandLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        }
-        
         if (parts.Length == 0) return false;
 
         var usedSudo = parts[0] == "sudo";
         if (usedSudo) parts = parts.Skip(1).ToArray();
-
         if (parts.Length == 0) return false;
 
-        var cmdName = parts[0];
+        var cmdName = parts[0].ToLower();
         var args = parts.Skip(1).ToArray();
 
         if (cmdName.StartsWith("./"))
-        {
             return ExecuteLocalFile(commandLine);
-        }
 
         if (CustomCommands.TryGetValue(cmdName, out var customCmd))
         {
@@ -319,25 +282,16 @@ public class CommandParser
             if (fullPath != null)
             {
                 RunSystemCommand(fullPath, args, usedSudo);
-
-                if ((cmdName == "apt" || cmdName == "apt-get") && args.Length > 0 && args[0] == "install")
-                {
-                    CommandLoader.RefreshCommands();
-                }
-
                 return true;
             }
         }
 
         AnsiConsole.MarkupLine($"[[[red]-[/]]] - Unknown command: [bold yellow]{cmdName}[/]");
-        
-        // Suggest similar commands
+
         var suggestions = GetCommandSuggestions(cmdName);
         if (suggestions.Count > 0)
-        {
             AnsiConsole.MarkupLine($"[[[yellow]*[/]]] - Did you mean: {string.Join(", ", suggestions.Select(s => $"[cyan]{s}[/]"))}");
-        }
-        
+
         return true;
     }
 
@@ -347,27 +301,21 @@ public class CommandParser
     private static List<string> GetCommandSuggestions(string cmdName, int maxDistance = 3, int maxSuggestions = 3)
     {
         var suggestions = new List<(string cmd, int distance)>();
-        
-        // Check custom commands
+
         foreach (var cmd in CustomCommands.Keys)
         {
             int distance = CalculateLevenshteinDistance(cmdName, cmd);
             if (distance <= maxDistance)
-            {
                 suggestions.Add((cmd, distance));
-            }
         }
-        
-        // Check system commands (only common ones to avoid overwhelming output)
+
         foreach (var cmd in SystemCommands.Take(1000))
         {
             int distance = CalculateLevenshteinDistance(cmdName, cmd);
             if (distance <= maxDistance)
-            {
                 suggestions.Add((cmd, distance));
-            }
         }
-        
+
         return suggestions
             .OrderBy(s => s.distance)
             .Take(maxSuggestions)
@@ -382,7 +330,7 @@ public class CommandParser
     {
         if (string.IsNullOrEmpty(source))
             return target?.Length ?? 0;
-        
+
         if (string.IsNullOrEmpty(target))
             return source.Length;
 

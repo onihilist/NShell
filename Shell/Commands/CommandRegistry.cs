@@ -20,7 +20,6 @@ public static class CommandRegistry
     {
         return new List<ICustomCommand>
         {
-            new CdCommand(),
             new SetThemeCommand(),
             new ExitCommand(),
             new ClearCommand(),
@@ -31,8 +30,6 @@ public static class CommandRegistry
             new AliasCommand(),
             new UnaliasCommand(),
             new HistoryCommand(),
-            new EchoCommand(),
-            new PwdCommand(),
             new WhichCommand(),
             new AboutCommand(),
         };

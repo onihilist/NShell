@@ -42,7 +42,7 @@ public class PluginLoader
                 }
                 catch (Exception ex)
                 {
-                    AnsiConsole.MarkupLine($"\t[[[red]-[/]]] - Failed to load plugin: {Path.GetFileName(pluginPath)}");
+                    AnsiConsole.MarkupLine($"\t[[[red]-[/]]] - Failed to load plugin: [yellow]{Path.GetFileName(pluginPath)}[/]");
                     AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
                 }
             }
@@ -76,7 +76,7 @@ public class PluginLoader
                 {
                     if (Activator.CreateInstance(type) is ICustomCommand command)
                     {
-                        CommandRegistry.Register(command);
+                        CommandParser.CustomCommands[command.Name.ToLower()] = command;
                         AnsiConsole.MarkupLine($"[[[green]+[/]]] - Loaded plugin command: [yellow]{command.Name}[/]");
                     }
                 }

@@ -34,7 +34,6 @@ It's designed for hackers, shell lovers, and those who enjoy boot sequences.
 - ✅ Command chaining (&&, ||, ;)
 - ✅ Basic piping support (|)
 
-
 ---
 
 ### 🚀 Installation
@@ -76,6 +75,55 @@ So enter the command : `settheme test`.</br>
 This is the result :
 
 ![Preview Test Theme](https://github.com/user-attachments/assets/eaea69b7-0f9e-4f0f-8d0b-7c92ffe8c4f1)
+
+---
+
+### ⚙️ Plugin(s)
+
+Since version 0.5.0, you can build your own plugin (DLL) and add this to NShell.
+This is a simple exemple : 
+
+```csharp
+using NShell.Shell.Commands;
+using NShell.Shell;
+using Spectre.Console;
+
+namespace HelloPlugin
+{
+    public class HelloPlugin : ICustomCommand
+    {
+        public string Name => "hello";
+
+        public HelloPlugin()
+        {
+            CommandRegistry.Register(this);
+        }
+
+        public void Execute(ShellContext context, string[] args)
+        {
+            AnsiConsole.MarkupLine("[green]Hello from HelloPlugin![/]");
+        }
+    }
+}
+```
+
+And **DON'T FORGET TO USE THE SAME IMPORTS AS NSHELL** !
+With the same version of `Spectre.Console (0.50.0)
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup>
+  <TargetFramework>net8.0</TargetFramework>
+  <ImplicitUsings>enable</ImplicitUsings>
+  <Nullable>enable</Nullable>
+</PropertyGroup>
+<ItemGroup>
+  <ProjectReference Include="../NShell/NShell.csproj"/>
+  <PackageReference Include="Spectre.Console" Version="0.50.0" />
+</ItemGroup>
+</Project>
+
+```
 
 ---
 

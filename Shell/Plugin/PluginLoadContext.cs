@@ -12,13 +12,14 @@ public class PluginLoadContext : AssemblyLoadContext
 
     protected override Assembly? Load(AssemblyName assemblyName)
     {
-        if (assemblyName.Name == "System.Runtime"
-            || assemblyName.Name == "System.Private.CoreLib"
-            || (assemblyName.Name != null && (assemblyName.Name.StartsWith("System.") || assemblyName.Name.StartsWith("Microsoft."))))
+        if (assemblyName.Name!.StartsWith("System.")
+            || assemblyName.Name.StartsWith("Microsoft.")
+            || assemblyName.Name == "System.Runtime"
+            || assemblyName.Name == "System.Private.CoreLib")
         {
-            return null;
+            return AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
         }
-
+        
         var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
         if (assemblyPath != null)
         {
@@ -28,8 +29,7 @@ public class PluginLoadContext : AssemblyLoadContext
 
         return null;
     }
-
-
+    
     protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
     {
         string? libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
