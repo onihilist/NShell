@@ -108,7 +108,7 @@ namespace HelloPlugin
 ```
 
 And **DON'T FORGET TO USE THE SAME IMPORTS AS NSHELL** !
-With the same version of `Spectre.Console (0.50.0)
+With the same version of `Spectre.Console` (`0.50.0`)
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -216,5 +216,6 @@ sudo apt update
 sudo apt install dos2unix
 dos2unix install.sh
 ```
+
 
 
