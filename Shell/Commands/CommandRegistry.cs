@@ -21,6 +21,7 @@ public static class CommandRegistry
         return new List<ICustomCommand>
         {
             new SetThemeCommand(),
+            new CdCommand(),
             new ExitCommand(),
             new ClearCommand(),
             new HelpCommand(),
