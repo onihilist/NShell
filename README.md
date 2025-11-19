@@ -49,6 +49,28 @@ chmod +x install.sh
 
 ---
 
+### 🔧 Configuration file
+
+The configuration file is available in the `.nshell` folder.
+And he is downloaded from here: https://gist.github.com/onihilist/8bf7548dc7478f1b6af2db4bdc0c668d
+
+```json
+{
+  "configuration": {
+    "nshell": {
+      "history": [
+        {
+          "expiration_time": "7d",
+          "max_storage": 500
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
 ### 🎨 Custom themes
 
 This is a little exemple of an custom theme.</br>

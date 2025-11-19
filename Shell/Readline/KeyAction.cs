@@ -300,7 +300,7 @@ public partial class KeyHandler
 
 	private void HandleHistorySearch()
 	{
-		var search = new NShell.Shell.History.HistorySearch(_history);
+		var search = new History.HistorySearch(_history);
 		var result = search.Search(_initCursorPos4Console);
 		
 		if (result != null)

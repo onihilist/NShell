@@ -30,7 +30,14 @@ namespace NShell.Shell.History
         private void Load()
         {
             if (File.Exists(_historyPath))
+            {
                 _history.AddRange(File.ReadAllLines(_historyPath));
+            }
+            else
+            {
+                File.Create(_historyPath).Close();
+                _history.AddRange(File.ReadAllLines(_historyPath));
+            }
         }
 
         /// <summary>
