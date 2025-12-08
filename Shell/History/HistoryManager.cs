@@ -36,7 +36,6 @@ namespace NShell.Shell.History
             else
             {
                 File.Create(_historyPath).Close();
-                _history.AddRange(File.ReadAllLines(_historyPath));
             }
         }
 
@@ -58,6 +57,7 @@ namespace NShell.Shell.History
             {
                 _history.Add(command);
                 _currentIndex = _history.Count;
+                File.WriteAllLines(_historyPath, _history);
             }
         }
 
